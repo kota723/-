@@ -95,7 +95,7 @@ app.post('/reserve', async (req, res) => {
     classrooms[room].available = false; // 教室を予約済みに設定
     res.status(200).json({ message: '予約が完了しました！' });
   } catch (error) {
-    console.error('Slack送信エラー:', error.message);
+    console.error('Slack送信エラー:', error.response ? error.response.data : error.message);
     res.status(500).json({ message: 'Slack通知に失敗しました' });
   }
 });
