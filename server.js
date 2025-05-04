@@ -74,6 +74,17 @@ app.post('/reserve', async (req, res) => {
   }
 
   const reservations = loadReservations();
+
+  // 予約データの重複を防ぐ
+  const existingReservation = reservations.find(r => r.room === room && r.date === date && (
+      (startTime >= r.startTime && startTime < r.endTime) ||
+      (endTime > r.startTime && endTime <= r.endTime)
+  ));
+
+  if (existingReservation) {
+      return res.status(400).json({ message: '同じ時間帯に既に予約があります' });
+  }
+
   reservations.push({ room, user, date, startTime, endTime });
   saveReservations(reservations);
 
@@ -90,13 +101,19 @@ app.post('/reserve', async (req, res) => {
 👨‍🏫 担任: ${classrooms[room]?.teacher}`
   };
 
+  // Slack通知のエラー処理を改善
   try {
     await axios.post(SLACK_WEBHOOK_URLS[room], message);
     classrooms[room].available = false; // 教室を予約済みに設定
     res.status(200).json({ message: '予約が完了しました！' });
   } catch (error) {
-    console.error('Slack送信エラー:', error.response ? error.response.data : error.message);
-    res.status(500).json({ message: 'Slack通知に失敗しました' });
+    if (error.response && error.response.data) {
+      console.error('Slack送信エラー:', error.response.data);
+      res.status(500).json({ message: `Slack通知に失敗しました: ${error.response.data}` });
+    } else {
+      console.error('Slack送信エラー:', error.message);
+      res.status(500).json({ message: 'Slack通知に失敗しました' });
+    }
   }
 });
 
