@@ -6,6 +6,7 @@ const path = require('path');
 require('dotenv').config();
 const routes = require('./routes');
 const cors = require('cors');
+const { WebClient } = require('@slack/web-api');
 
 const app = express();
 const PORT = 3000;
@@ -15,10 +16,12 @@ app.use(express.json());
 // CORSを有効化
 app.use(cors());
 
-const SLACK_WEBHOOK_URLS = {
-  '101': process.env.SLACK_WEBHOOK_URL_1A,
-  '102': process.env.SLACK_WEBHOOK_URL_2B,
-  '103': process.env.SLACK_WEBHOOK_URL_3C
+const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
+
+const SLACK_CHANNELS = {
+  '101': 'C01A2B3C4D5', // チャンネルIDを指定
+  '102': 'C02A2B3C4D6',
+  '103': 'C03A2B3C4D7'
 };
 
 // 教室の空き状況を管理するデータ構造
@@ -160,8 +163,11 @@ app.post('/reserve', async (req, res) => {
     return res.status(400).json({ message: `${room} は現在予約できません` });
   }
 
-  const message = {
-    text: `📢 *教室予約通知*
+  // Slack通知のエラー処理を改善
+  try {
+    await slackClient.chat.postMessage({
+      channel: SLACK_CHANNELS[room],
+      text: `📢 *教室予約通知*
 👤 代表者名: ${user}
 🏢 団体名: ${req.body.name || '未指定'}
 🏫 教室: ${room}
@@ -169,22 +175,12 @@ app.post('/reserve', async (req, res) => {
 🕒 時間: ${startTime} - ${endTime}
 🎯 用途: ${purpose}
 👨‍🏫 担任: ${classrooms[room]?.teacher}`
-  };
-
-  // Slack通知のエラー処理を改善
-  try {
-    await axios.post(SLACK_WEBHOOK_URLS[room], message);
+    });
     classrooms[room].available = false; // 教室を予約済みに設定
     res.status(200).json({ message: '予約が完了しました！' });
   } catch (error) {
-    console.error('Slack通知エラー詳細:', error.response?.data || error.message);
-    if (error.response && error.response.data) {
-      console.error('Slack送信エラー:', error.response.data);
-      res.status(500).json({ message: `Slack通知に失敗しました: ${error.response.data}` });
-    } else {
-      console.error('Slack送信エラー:', error.message);
-      res.status(500).json({ message: 'Slack通知に失敗しました' });
-    }
+    console.error('Slack通知エラー詳細:', error.data || error.message);
+    res.status(500).json({ message: 'Slack通知に失敗しました' });
   }
 });
 
