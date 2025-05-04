@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>管理者ページ</title>
+</head>
+<body>
+  <h1>管理者ページ</h1>
+  <h2>予約状況</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>教室</th>
+        <th>予約者</th>
+        <th>日付</th>
+        <th>開始時間</th>
+        <th>終了時間</th>
+      </tr>
+    </thead>
+    <tbody id="reservationsTable">
+      <!-- 予約データがここに挿入されます -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchReservations() {
+      const res = await fetch('/admin/reservations');
+      const reservations = await res.json();
+
+      const tableBody = document.getElementById('reservationsTable');
+      tableBody.innerHTML = '';
+
+      reservations.forEach(reservation => {
+        const row = document.createElement('tr');
+
+        const roomCell = document.createElement('td');
+        roomCell.textContent = reservation.room;
+        row.appendChild(roomCell);
+
+        const userCell = document.createElement('td');
+        userCell.textContent = reservation.user;
+        row.appendChild(userCell);
+
+        const dateCell = document.createElement('td');
+        dateCell.textContent = reservation.date;
+        row.appendChild(dateCell);
+
+        const startTimeCell = document.createElement('td');
+        startTimeCell.textContent = reservation.startTime;
+        row.appendChild(startTimeCell);
+
+        const endTimeCell = document.createElement('td');
+        endTimeCell.textContent = reservation.endTime;
+        row.appendChild(endTimeCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    fetchReservations();
+  </script>
+</body>
+</html>
