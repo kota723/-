@@ -96,5 +96,36 @@
     "date": "2025-05-27",
     "startTime": "18:07",
     "endTime": "19:07"
+  },
+  {
+    "room": "1A",
+    "user": "鎌田康太",
+    "date": "2025-05-04",
+    "startTime": "15:00",
+    "endTime": "16:00"
+  },
+  {
+    "room": "207",
+    "user": "鎌田の歌",
+    "date": "2025-05-05",
+    "startTime": "00:00",
+    "endTime": "00:30",
+    "purpose": "部活"
+  },
+  {
+    "room": "207",
+    "user": "鎌田の歌",
+    "date": "2025-05-05",
+    "startTime": "00:32",
+    "endTime": "00:55",
+    "purpose": "部活"
+  },
+  {
+    "room": "107",
+    "user": "鎌田こうた",
+    "date": "2025-05-07",
+    "startTime": "10:49",
+    "endTime": "11:49",
+    "purpose": "部活"
   }
 ]

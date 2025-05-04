@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>予約画面</title>
+  <style>
+    body {
+      font-family: "Helvetica", sans-serif;
+      background-color: #f4faff;
+      margin: 20px;
+      text-align: center;
+    }
+
+    form {
+      display: inline-block;
+      text-align: left;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #classroom-status {
+      margin-top: 20px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>予約画面</h1>
+
+  <form id="reservationForm">
+    <label for="name">代表者名:</label>
+    <input type="text" id="name" name="name" placeholder="代表者名を入力してください" required>
+
+    <label for="user">団体名:</label>
+    <input type="text" id="user" name="user" placeholder="団体名を入力してください" required>
+
+    <label for="date">日付:</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="startTime">開始時間:</label>
+    <input type="time" id="startTime" name="startTime" required>
+
+    <label for="endTime">終了時間:</label>
+    <input type="time" id="endTime" name="endTime" required>
+
+    <label for="purpose">用途:</label>
+    <input type="text" id="purpose" name="purpose" placeholder="用途を入力してください" required>
+
+    <label for="room">教室:</label>
+    <select id="room" name="room" required>
+      <option value="">教室を選択してください</option>
+      <option value="101">101</option>
+      <option value="102">102</option>
+      <option value="103">103</option>
+      <option value="104">104</option>
+      <option value="105">105</option>
+      <option value="106">106</option>
+      <option value="107">107</option>
+      <option value="108">108</option>
+      <option value="109">109</option>
+      <option value="110">110</option>
+      <option value="111">111</option>
+      <option value="112">112</option>
+      <option value="201">201</option>
+      <option value="202">202</option>
+      <option value="203">203</option>
+      <option value="204">204</option>
+      <option value="205">205</option>
+      <option value="206">206</option>
+      <option value="207">207</option>
+      <option value="208">208</option>
+      <option value="209">209</option>
+      <option value="210">210</option>
+      <option value="211">211</option>
+      <option value="212">212</option>
+      <option value="213">213</option>
+      <option value="214">214</option>
+      <option value="221">221</option>
+      <option value="222">222</option>
+      <option value="223">223</option>
+      <option value="224">224</option>
+      <option value="225">225</option>
+      <option value="226">226</option>
+      <option value="301">301</option>
+      <option value="302">302</option>
+      <option value="303">303</option>
+      <option value="304">304</option>
+      <option value="305">305</option>
+      <option value="306">306</option>
+      <option value="307">307</option>
+      <option value="308">308</option>
+      <option value="309">309</option>
+      <option value="310">310</option>
+      <option value="311">311</option>
+      <option value="312">312</option>
+      <option value="313">313</option>
+      <option value="314">314</option>
+      <option value="315">315</option>
+      <option value="316">316</option>
+    </select>
+
+    <button type="submit">予約する</button>
+  </form>
+
+  <div id="classroom-status"></div>
+  <button onclick="reserveRoom()">教室の予約状況を確認</button>
+
+  <script>
+    document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      const res = await fetch('/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      alert(result.message);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const room = urlParams.get('room');
+      const date = urlParams.get('date') || '';
+      const time = urlParams.get('time') || '';
+
+      if (room) {
+        document.getElementById('room').value = room;
+      }
+      if (date) {
+        document.getElementById('date').value = date;
+      }
+      if (time) {
+        document.getElementById('startTime').value = time;
+      }
+    });
+
+    async function reserveRoom() {
+      const date = prompt('日程を入力してください (例: 2025-05-15):');
+      const time = prompt('時間を入力してください (例: 14:00):');
+
+      if (!date || !time) {
+          alert('日程と時間は必須です。');
+          return;
+      }
+
+      try {
+          const response = await fetch(`/classrooms?date=${date}&time=${time}`);
+          const classroomsStatus = await response.json();
+
+          const container = document.getElementById('classroom-status');
+          container.innerHTML = ''; // 既存の内容をクリア
+
+          Object.keys(classroomsStatus).forEach(room => {
+              const status = classroomsStatus[room].available;
+              const roomElement = document.createElement('div');
+              roomElement.textContent = `教室: ${room}`;
+              roomElement.style.color = status ? 'green' : 'red';
+              container.appendChild(roomElement);
+          });
+      } catch (error) {
+          console.error('教室の予約状況取得中にエラーが発生しました:', error);
+          alert('教室の予約状況を取得できませんでした。');
+      }
+    }
+  </script>
+
+</body>
+</html>

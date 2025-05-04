@@ -3,87 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>教室予約アプリ</title>
+  <style>
+    body {
+      font-family: "Helvetica", sans-serif;
+      background-color: #f4faff;
+      margin: 20px;
+      text-align: center;
+    }
+
+    .floor-button {
+      background-color: #0066cc;
+      color: white;
+      padding: 20px 40px;
+      border: none;
+      border-radius: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      margin: 20px;
+    }
+
+    .floor-button:hover {
+      background-color: #004a99;
+    }
+
+    form {
+      margin-top: 30px;
+    }
+
+    label {
+      font-size: 18px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 18px;
+      margin: 10px 0;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button[type="submit"] {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #218838;
+    }
+  </style>
 </head>
 <body>
+
   <h1>放課後 教室予約システム</h1>
 
-  <form id="reservationForm">
-    <label>教室を選択:
-      <select name="room" required>
-        <option value="1A">1A教室</option>
-        <option value="2B">2B教室</option>
-        <option value="3C">3C教室</option>
-      </select>
-    </label><br><br>
-
-    <label>名前: <input type="text" name="user" required pattern=".*\S.*" title="名前を入力してください"></label><br><br>
-
-    <label>日付: <input type="date" name="date" required></label><br><br>
-    <label>開始時間: <input type="time" name="startTime" required></label><br><br>
-    <label>終了時間: <input type="time" name="endTime" required></label><br><br>
-
-    <button type="submit">予約する</button>
-  </form>
-
-  <div id="message"></div>
-
-  <h2>教室の空き状況</h2>
-  <ul id="classroomStatus"></ul>
-
-  <h2>管理者用ページ</h2>
-  <a href="/admin.html">管理者ページに移動</a>
+  <div>
+    <button class="floor-button" onclick="navigateToFloor(1)">1階</button>
+    <button class="floor-button" onclick="navigateToFloor(2)">2階</button>
+    <button class="floor-button" onclick="navigateToFloor(3)">3階</button>
+  </div>
 
   <script>
-    // 教室の空き状況を取得して表示
-    async function fetchClassroomStatus() {
-      const res = await fetch('/classrooms');
-      const classrooms = await res.json();
-
-      const statusList = document.getElementById('classroomStatus');
-      statusList.innerHTML = '';
-
-      for (const [room, info] of Object.entries(classrooms)) {
-        const status = info.available ? '空きあり' : '予約済み';
-        const listItem = document.createElement('li');
-        listItem.textContent = `${room}: ${status} (担任: ${info.teacher})`;
-        statusList.appendChild(listItem);
-      }
+    function navigateToFloor(floor) {
+      window.location.href = `/floor${floor}.html`;
     }
 
-    fetchClassroomStatus();
-
-    document.getElementById('reservationForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = {
-        room: formData.get('room'),
-        user: formData.get('user'),
-        date: formData.get('date'),
-        startTime: formData.get('startTime'),
-        endTime: formData.get('endTime')
-      };
-
-      console.log('送信データ:', data); // デバッグ用ログ
-
-      const res = await fetch('/reserve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      const result = await res.json();
-      document.getElementById('message').textContent = result.message;
-
-      fetchClassroomStatus(); // 状況を更新
-    });
-
-    async function fetchReservations() {
-      const res = await fetch('/admin/reservations');
-      const reservations = await res.json();
-      console.log('予約データ:', reservations);
+    function navigateToReservationPage(room) {
+      window.location.href = `/reservation.html?room=${room}`;
     }
-
-    fetchReservations();
   </script>
+
 </body>
 </html>

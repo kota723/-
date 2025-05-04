@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>2階の空き状況</title>
+  <style>
+    body {
+      font-family: "Helvetica", sans-serif;
+      background-color: #f4faff;
+      margin: 20px;
+      text-align: center;
+    }
+
+    .room {
+      display: inline-block;
+      width: 100px;
+      height: 50px;
+      margin: 10px;
+      border-radius: 10px;
+      line-height: 50px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      background-color: #28a745; /* 緑色 */
+      cursor: pointer;
+    }
+
+    .room:hover {
+      background-color: #218838; /* ホバー時の濃い緑色 */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>2階の空き状況</h1>
+
+  <div style="margin-bottom: 20px;">
+    <label for="date">日付:</label>
+    <input type="date" id="date" name="date">
+
+    <label for="time">時間:</label>
+    <input type="time" id="time" name="time">
+
+    <button onclick="filterRooms()">フィルター</button>
+  </div>
+
+  <div id="rooms">
+    <script>
+      const rooms = [...Array.from({ length: 14 }, (_, i) => `${201 + i}`), ...Array.from({ length: 6 }, (_, i) => `${221 + i}`)];
+      const roomsDiv = document.getElementById('rooms');
+      rooms.forEach(room => {
+        const roomDiv = document.createElement('div');
+        roomDiv.className = 'room';
+        roomDiv.textContent = room;
+        roomDiv.onclick = () => navigateToReservationPage(room);
+        roomsDiv.appendChild(roomDiv);
+      });
+
+      function navigateToReservationPage(room) {
+        window.location.href = `/reservation.html?room=${room}`;
+      }
+
+      function filterRooms() {
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+
+        fetch(`/classrooms?date=${date}&time=${time}`)
+          .then(response => response.json())
+          .then(classrooms => {
+            const roomsDiv = document.getElementById('rooms');
+            roomsDiv.innerHTML = '';
+
+            Object.keys(classrooms).forEach(room => {
+              if (room.startsWith('2')) {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'room';
+                roomDiv.textContent = room;
+                roomDiv.onclick = () => navigateToReservation(room);
+                roomsDiv.appendChild(roomDiv);
+              }
+            });
+          });
+      }
+
+      function navigateToReservation(room) {
+        const date = document.getElementById('date')?.value || '';
+        const time = document.getElementById('time')?.value || '';
+        window.location.href = `/reservation.html?room=${room}&date=${date}&time=${time}`;
+      }
+    </script>
+  </div>
+
+</body>
+</html>

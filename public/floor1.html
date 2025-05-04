@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>1階の空き状況</title>
+  <style>
+    body {
+      font-family: "Helvetica", sans-serif;
+      background-color: #f4faff;
+      margin: 20px;
+      text-align: center;
+    }
+
+    .room {
+      display: inline-block;
+      width: 100px;
+      height: 50px;
+      margin: 10px;
+      border-radius: 10px;
+      line-height: 50px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      background-color: #28a745; /* 緑色 */
+      cursor: pointer;
+    }
+
+    .room:hover {
+      background-color: #218838; /* ホバー時の濃い緑色 */
+    }
+
+    .unavailable {
+      background-color: red; /* 予約済みの教室を赤色で表示 */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>1階の空き状況</h1>
+
+  <div style="margin-bottom: 20px;">
+    <label for="date">日付:</label>
+    <input type="date" id="date" name="date">
+
+    <label for="time">時間:</label>
+    <input type="time" id="time" name="time">
+
+    <button onclick="filterRooms()">フィルター</button>
+  </div>
+
+  <div id="rooms">
+    <!-- 1階の教室を四角で表示 -->
+    <script>
+      const rooms = Array.from({ length: 12 }, (_, i) => `${101 + i}`);
+      rooms.forEach(room => {
+        const roomDiv = document.createElement('div');
+        roomDiv.className = 'room';
+        roomDiv.textContent = room;
+        roomDiv.onclick = () => navigateToReservation(room);
+        document.getElementById('rooms').appendChild(roomDiv);
+      });
+
+      function navigateToReservation(room) {
+        const date = document.getElementById('date')?.value || '';
+        const time = document.getElementById('time')?.value || '';
+        window.location.href = `/reservation.html?room=${room}&date=${date}&time=${time}`;
+      }
+    </script>
+  </div>
+
+  <script>
+    async function fetchRoomStatus() {
+      const res = await fetch('/classrooms');
+      const classrooms = await res.json();
+
+      const roomsDiv = document.getElementById('rooms');
+      roomsDiv.innerHTML = '';
+
+      Object.keys(classrooms).forEach(room => {
+        if (room.startsWith('1')) { // 1階の部屋のみ表示
+          const roomDiv = document.createElement('div');
+          roomDiv.className = `room ${classrooms[room].available ? 'available' : 'unavailable'}`;
+          roomDiv.textContent = room;
+          roomDiv.onclick = () => reserveRoom(room);
+          roomsDiv.appendChild(roomDiv);
+        }
+      });
+    }
+
+    async function reserveRoom(room) {
+      const user = prompt('予約者名を入力してください:');
+      const purpose = prompt('用途を入力してください:');
+      if (!user || !purpose) return;
+
+      const res = await fetch('/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room, user, purpose, date: new Date().toISOString().split('T')[0], startTime: '15:00', endTime: '16:00' })
+      });
+
+      const result = await res.json();
+      alert(result.message);
+      fetchRoomStatus();
+    }
+
+    function filterRooms() {
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+
+      fetch(`/classrooms?date=${date}&time=${time}`)
+        .then(response => response.json())
+        .then(classrooms => {
+          const roomsDiv = document.getElementById('rooms');
+          roomsDiv.innerHTML = '';
+
+          Object.keys(classrooms).forEach(room => {
+            if (room.startsWith('1')) {
+              const roomDiv = document.createElement('div');
+              roomDiv.className = 'room';
+              roomDiv.textContent = room;
+              roomDiv.onclick = () => navigateToReservation(room);
+              roomsDiv.appendChild(roomDiv);
+            }
+          });
+        });
+    }
+
+    fetchRoomStatus();
+  </script>
+
+</body>
+</html>
