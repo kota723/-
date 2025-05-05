@@ -1,15 +1,14 @@
 const { google } = require('googleapis');
 const fs = require('fs');
 
-// 認証情報の読み込み
-const credentials = JSON.parse(fs.readFileSync('credentials.json'));
-const reservations = JSON.parse(fs.readFileSync('reservations.json'));
-
-// Google Sheets APIの認証設定
+// 環境変数名を`GOOGLE_SERVICE_ACCOUNT`に変更
+const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}');
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
+
+const reservations = JSON.parse(fs.readFileSync('reservations.json'));
 
 async function updateReservations() {
   const client = await auth.getClient();

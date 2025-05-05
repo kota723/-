@@ -167,8 +167,8 @@ app.get('/admin/reservations', (req, res) => {
   res.status(200).json(reservations);
 });
 
-// Googleスプレッドシートの設定
-const credentials = JSON.parse(fs.readFileSync('credentials.json'));
+// 環境変数からGoogle APIの認証情報を取得するように修正
+const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}');
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets']
