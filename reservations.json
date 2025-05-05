@@ -127,5 +127,29 @@
     "startTime": "10:49",
     "endTime": "11:49",
     "purpose": "部活"
+  },
+  {
+    "room": "107",
+    "user": "鎌田こうた",
+    "date": "2025-05-08",
+    "startTime": "09:34",
+    "endTime": "10:35",
+    "purpose": "部活"
+  },
+  {
+    "room": "101",
+    "user": "鎌田こうた",
+    "date": "2025-05-08",
+    "startTime": "09:34",
+    "endTime": "10:35",
+    "purpose": "部活"
+  },
+  {
+    "room": "206",
+    "user": "MM",
+    "date": "2025-05-08",
+    "startTime": "11:42",
+    "endTime": "13:42",
+    "purpose": "部活"
   }
 ]
