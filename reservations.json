@@ -118,5 +118,21 @@
     "startTime": "11:06",
     "endTime": "12:06",
     "purpose": "mtg"
+  },
+  {
+    "room": "105",
+    "user": "鎌田こうた",
+    "date": "2025-05-12",
+    "startTime": "12:09",
+    "endTime": "13:09",
+    "purpose": "部活"
+  },
+  {
+    "room": "207",
+    "user": "MIF委員",
+    "date": "2025-05-06",
+    "startTime": "18:38",
+    "endTime": "19:38",
+    "purpose": "部活"
   }
 ]

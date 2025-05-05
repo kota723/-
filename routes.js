@@ -26,4 +26,9 @@ router.get('/floor3.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'floor3.html'));
 });
 
+// 予約完了画面のルートを追加
+router.get('/confirmation.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
+});
+
 module.exports = router;

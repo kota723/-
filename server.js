@@ -191,7 +191,10 @@ async function updateSpreadsheet(reservations) {
     sheetRequests[room].push([user, date, startTime, endTime, purpose || '未指定']);
   });
 
-  for (const [room, rows] of Object.entries(sheetRequests)) {
+  const sortedRooms = Object.keys(sheetRequests).sort((a, b) => parseInt(a) - parseInt(b));
+
+  for (const room of sortedRooms) {
+    const rows = sheetRequests[room];
     try {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,

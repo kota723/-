@@ -150,8 +150,12 @@
         body: JSON.stringify(data)
       });
 
-      const result = await res.json();
-      alert(result.message);
+      if (res.redirected) {
+        window.location.href = res.url; // リダイレクト先に移動
+      } else {
+        const result = await res.json();
+        alert(result.message);
+      }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
