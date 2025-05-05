@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>予約完了</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4faff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #28a745;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>予約が完了しました！</h1>
+    <p>以下の内容で予約が完了しました:</p>
+    <p><strong>教室:</strong> <span id="room"></span></p>
+    <p><strong>予約者:</strong> <span id="user"></span></p>
+    <p><strong>日付:</strong> <span id="date"></span></p>
+    <p><strong>時間:</strong> <span id="startTime"></span> - <span id="endTime"></span></p>
+    <p><strong>用途:</strong> <span id="purpose"></span></p>
+    <a href="/" class="button">トップページに戻る</a>
+  </div>
+
+  <script>
+    // URLパラメータを取得して表示
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('room').textContent = params.get('room') || '不明';
+    document.getElementById('user').textContent = params.get('user') || '不明';
+    document.getElementById('date').textContent = params.get('date') || '不明';
+    document.getElementById('startTime').textContent = params.get('startTime') || '不明';
+    document.getElementById('endTime').textContent = params.get('endTime') || '不明';
+    document.getElementById('purpose').textContent = params.get('purpose') || '不明';
+  </script>
+</body>
+</html>

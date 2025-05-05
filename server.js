@@ -7,6 +7,7 @@ require('dotenv').config();
 const routes = require('./routes');
 const cors = require('cors');
 const { WebClient } = require('@slack/web-api');
+const { google } = require('googleapis');
 
 const app = express();
 const PORT = 3000;
@@ -166,6 +167,70 @@ app.get('/admin/reservations', (req, res) => {
   res.status(200).json(reservations);
 });
 
+// Googleスプレッドシートの設定
+const credentials = JSON.parse(fs.readFileSync('credentials.json'));
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
+});
+
+async function updateSpreadsheet(reservations) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const spreadsheetId = '1_MAdFa8aaQ5nHFg_6dkBVDHGqctu4flPDl-jfPRm6XY'; // 正しいスプレッドシートIDを設定
+
+  const sheetRequests = {};
+
+  reservations.forEach(reservation => {
+    const { room, user, date, startTime, endTime, purpose } = reservation;
+
+    if (!sheetRequests[room]) {
+      sheetRequests[room] = [];
+    }
+
+    sheetRequests[room].push([user, date, startTime, endTime, purpose || '未指定']);
+  });
+
+  for (const [room, rows] of Object.entries(sheetRequests)) {
+    try {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        resource: {
+          requests: [
+            {
+              addSheet: {
+                properties: {
+                  title: room
+                }
+              }
+            }
+          ]
+        }
+      });
+    } catch (error) {
+      if (!error.message.includes('already exists')) {
+        console.error(`シート作成エラー: ${room}`, error);
+        continue;
+      }
+    }
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${room}!A1`,
+      valueInputOption: 'RAW',
+      resource: {
+        values: [
+          ['予約者', '日付', '開始時間', '終了時間', '用途'],
+          ...rows
+        ]
+      }
+    });
+  }
+}
+
+// 予約完了画面の静的ファイルを提供
+app.use('/confirmation.html', express.static(path.join(__dirname, 'public', 'confirmation.html')));
+
 // 教室予約のPOSTエンドポイント
 app.post('/reserve', async (req, res) => {
   const { room, user, date, startTime, endTime, purpose } = req.body;
@@ -175,7 +240,6 @@ app.post('/reserve', async (req, res) => {
   // 必須フィールドのバリデーション
   const missingFields = [];
   if (!room) missingFields.push('room');
-  // ユーザー名が漢字でも問題なく処理されるようにエンコードを確認
   if (!user || typeof user !== 'string' || user.trim() === '') {
     missingFields.push('user');
   }
@@ -204,11 +268,6 @@ app.post('/reserve', async (req, res) => {
   reservations.push({ room, user, date, startTime, endTime, purpose });
   saveReservations(reservations);
 
-  if (!classrooms[room]?.available) {
-    return res.status(400).json({ message: `${room} は現在予約できません` });
-  }
-
-  // Slack通知のエラー処理を改善
   try {
     await slackClient.chat.postMessage({
       channel: SLACK_CHANNELS[room],
@@ -218,11 +277,16 @@ app.post('/reserve', async (req, res) => {
 🏫 教室: ${room}
 📅 日付: ${date}
 🕒 時間: ${startTime} - ${endTime}
-🎯 用途: ${purpose}
-👨‍🏫 担任: ${classrooms[room]?.teacher}`
+🎯 用途: ${purpose}`
     });
-    classrooms[room].available = false; // 教室を予約済みに設定
-    res.status(200).json({ message: '予約が完了しました！' });
+
+    // スプレッドシートを更新
+    await updateSpreadsheet(reservations);
+
+    classrooms[room].available = false;
+
+    // 予約完了画面にリダイレクト
+    res.redirect(`/confirmation.html?room=${encodeURIComponent(room)}&user=${encodeURIComponent(user)}&date=${encodeURIComponent(date)}&startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}&purpose=${encodeURIComponent(purpose)}`);
   } catch (error) {
     console.error('Slack通知エラー詳細:', error.data || error.message);
     res.status(500).json({ message: 'Slack通知に失敗しました' });

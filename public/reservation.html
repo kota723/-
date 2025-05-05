@@ -171,33 +171,42 @@
       }
     });
 
-    async function reserveRoom() {
-      const date = prompt('日程を入力してください (例: 2025-05-15):');
-      const time = prompt('時間を入力してください (例: 14:00):');
+    function reserveRoom() {
+      const room = document.getElementById('room').value;
+      const user = document.getElementById('user').value;
+      const date = document.getElementById('date').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const purpose = document.getElementById('purpose').value;
 
-      if (!date || !time) {
-          alert('日程と時間は必須です。');
-          return;
+      if (!room || !user || !date || !startTime || !endTime || !purpose) {
+        alert('すべてのフィールドを入力してください');
+        return;
       }
 
-      try {
-          const response = await fetch(`/classrooms?date=${date}&time=${time}`);
-          const classroomsStatus = await response.json();
-
-          const container = document.getElementById('classroom-status');
-          container.innerHTML = ''; // 既存の内容をクリア
-
-          Object.keys(classroomsStatus).forEach(room => {
-              const status = classroomsStatus[room].available;
-              const roomElement = document.createElement('div');
-              roomElement.textContent = `教室: ${room}`;
-              roomElement.style.color = status ? 'green' : 'red';
-              container.appendChild(roomElement);
-          });
-      } catch (error) {
-          console.error('教室の予約状況取得中にエラーが発生しました:', error);
-          alert('教室の予約状況を取得できませんでした。');
-      }
+      fetch('/reserve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ room, user, date, startTime, endTime, purpose })
+      })
+        .then(response => {
+          if (response.redirected) {
+            window.location.href = response.url; // リダイレクト先に移動
+          } else {
+            return response.json();
+          }
+        })
+        .then(data => {
+          if (data && data.message) {
+            alert(data.message);
+          }
+        })
+        .catch(error => {
+          console.error('予約エラー:', error);
+          alert('予約に失敗しました');
+        });
     }
   </script>
 

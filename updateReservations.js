@@ -41,7 +41,7 @@ async function updateReservations() {
             {
               addSheet: {
                 properties: {
-                  title: room
+                  title: room // 教室番号をそのままタブ名に使用
                 }
               }
             }
