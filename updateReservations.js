@@ -1,6 +1,11 @@
 const { google } = require('googleapis');
 const fs = require('fs');
 
+if (process.env.CREDENTIALS_JSON_BASE64) {
+  const credentials = Buffer.from(process.env.CREDENTIALS_JSON_BASE64, 'base64').toString('utf-8');
+  fs.writeFileSync('credentials.json', credentials);
+}
+
 // 環境変数名を`GOOGLE_SERVICE_ACCOUNT`に変更
 const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}');
 const auth = new google.auth.GoogleAuth({

@@ -324,3 +324,8 @@ app.use('/', routes);
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ 教室予約サーバー起動中 → http://0.0.0.0:${PORT}`);
 });
+
+if (process.env.CREDENTIALS_JSON_BASE64) {
+  const credentials = Buffer.from(process.env.CREDENTIALS_JSON_BASE64, 'base64').toString('utf-8');
+  fs.writeFileSync('credentials.json', credentials);
+}
