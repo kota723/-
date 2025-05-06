@@ -26,13 +26,13 @@ async function updateReservations() {
   const sheetRequests = {};
 
   reservations.forEach(reservation => {
-    const { room, user, date, startTime, endTime, purpose } = reservation;
+    const { room, Name,user,date, startTime, endTime, purpose } = reservation;
 
     if (!sheetRequests[room]) {
       sheetRequests[room] = [];
     }
 
-    sheetRequests[room].push([user, date, startTime, endTime, purpose || '未指定']);
+    sheetRequests[room].push([user, Name, date, startTime, endTime, purpose || '未指定']);
   });
 
   for (const [room, rows] of Object.entries(sheetRequests)) {

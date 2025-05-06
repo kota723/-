@@ -182,13 +182,13 @@ async function updateSpreadsheet(reservations) {
   const sheetRequests = {};
 
   reservations.forEach(reservation => {
-    const { room, user, date, startTime, endTime, purpose, name } = reservation;
+    const { room, Name,user, date, startTime, endTime, purpose} = reservation; // `Name`に変更
 
     if (!sheetRequests[room]) {
       sheetRequests[room] = [];
     }
 
-    sheetRequests[room].push([name || '未指定', user || '未指定', date, startTime, endTime, purpose || '未指定']);
+    sheetRequests[room].push([Name ||  user ||  date, startTime, endTime, purpose]);
   });
 
   for (const [room, rows] of Object.entries(sheetRequests)) {
@@ -240,10 +240,11 @@ app.post('/reserve', async (req, res) => {
   // 必須フィールドのバリデーション
   const missingFields = [];
   if (!room) missingFields.push('room');
+  if (!Name) missingFields.push('Name');
   if (!user || typeof user !== 'string' || user.trim() === '') {
     missingFields.push('user');
   }
-  if (!date) missingFields.push('date');
+  if (!date) missingFields.push('date'); 
   if (!startTime) missingFields.push('startTime');
   if (!endTime) missingFields.push('endTime');
   if (!purpose) missingFields.push('purpose');
@@ -272,8 +273,8 @@ app.post('/reserve', async (req, res) => {
     await slackClient.chat.postMessage({
       channel: SLACK_CHANNELS[room],
       text: `📢 *教室予約通知*
-👤 代表者名: ${user}
-🏢 団体名: ${req.body.name || '未指定'}
+👤 団体名: ${user}
+🏢 代表者名: ${Name}
 🏫 教室: ${room}
 📅 日付: ${date}
 🕒 時間: ${startTime} - ${endTime}
