@@ -182,13 +182,13 @@ async function updateSpreadsheet(reservations) {
   const sheetRequests = {};
 
   reservations.forEach(reservation => {
-    const { room, user, date, startTime, endTime, purpose, organization } = reservation;
+    const { room, user, date, startTime, endTime, purpose, name } = reservation;
 
     if (!sheetRequests[room]) {
       sheetRequests[room] = [];
     }
 
-    sheetRequests[room].push([user, organization || '未指定', date, startTime, endTime, purpose || '未指定']);
+    sheetRequests[room].push([name || '未指定', user || '未指定', date, startTime, endTime, purpose || '未指定']);
   });
 
   for (const [room, rows] of Object.entries(sheetRequests)) {
@@ -220,7 +220,7 @@ async function updateSpreadsheet(reservations) {
       valueInputOption: 'RAW',
       resource: {
         values: [
-          ['予約者', '団体名', '日付', '開始時間', '終了時間', '用途'],
+          ['代表者名', '団体名', '日付', '開始時間', '終了時間', '用途'],
           ...rows
         ]
       }
@@ -330,11 +330,6 @@ if (process.env.CREDENTIALS_JSON_BASE64) {
   fs.writeFileSync('credentials.json', credentials);
 }
 
-// Google Sheets APIの認証設定
-const auth = new google.auth.GoogleAuth({
-  keyFile: 'credentials.json', // 認証情報ファイルのパス
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
 
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = '1_MAdFa8aaQ5nHFg_6dkBVDHGqctu4flPDl-jfPRm6XY';
