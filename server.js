@@ -337,21 +337,17 @@ const auth = new google.auth.GoogleAuth({
 });
 
 const sheets = google.sheets({ version: 'v4', auth });
-
-// スプレッドシートIDを指定
-const SPREADSHEET_ID = 'your_spreadsheet_id_here';
+const SPREADSHEET_ID = '1_MAdFa8aaQ5nHFg_6dkBVDHGqctu4flPDl-jfPRm6XY';
 
 // スプレッドシートにデータを追加するエンドポイント
 app.post('/add-to-sheet', async (req, res) => {
   try {
     const { room, user, date, startTime, endTime, purpose } = req.body;
-
-    // スプレッドシートに追加するデータ
     const values = [[room, user, date, startTime, endTime, purpose]];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A1', // シート名と範囲を指定
+      range: 'Sheet1!A1',
       valueInputOption: 'RAW',
       resource: { values },
     });
