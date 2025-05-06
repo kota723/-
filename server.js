@@ -182,13 +182,13 @@ async function updateSpreadsheet(reservations) {
   const sheetRequests = {};
 
   reservations.forEach(reservation => {
-    const { room, user, date, startTime, endTime, purpose } = reservation;
+    const { room, user, date, startTime, endTime, purpose, organization } = reservation;
 
     if (!sheetRequests[room]) {
       sheetRequests[room] = [];
     }
 
-    sheetRequests[room].push([user, date, startTime, endTime, purpose || '未指定']);
+    sheetRequests[room].push([user, organization || '未指定', date, startTime, endTime, purpose || '未指定']);
   });
 
   for (const [room, rows] of Object.entries(sheetRequests)) {
@@ -220,7 +220,7 @@ async function updateSpreadsheet(reservations) {
       valueInputOption: 'RAW',
       resource: {
         values: [
-          ['予約者', '日付', '開始時間', '終了時間', '用途'],
+          ['予約者', '団体名', '日付', '開始時間', '終了時間', '用途'],
           ...rows
         ]
       }
@@ -329,3 +329,36 @@ if (process.env.CREDENTIALS_JSON_BASE64) {
   const credentials = Buffer.from(process.env.CREDENTIALS_JSON_BASE64, 'base64').toString('utf-8');
   fs.writeFileSync('credentials.json', credentials);
 }
+
+// Google Sheets APIの認証設定
+const auth = new google.auth.GoogleAuth({
+  keyFile: 'credentials.json', // 認証情報ファイルのパス
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+const sheets = google.sheets({ version: 'v4', auth });
+
+// スプレッドシートIDを指定
+const SPREADSHEET_ID = 'your_spreadsheet_id_here';
+
+// スプレッドシートにデータを追加するエンドポイント
+app.post('/add-to-sheet', async (req, res) => {
+  try {
+    const { room, user, date, startTime, endTime, purpose } = req.body;
+
+    // スプレッドシートに追加するデータ
+    const values = [[room, user, date, startTime, endTime, purpose]];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Sheet1!A1', // シート名と範囲を指定
+      valueInputOption: 'RAW',
+      resource: { values },
+    });
+
+    res.status(200).send({ message: 'スプレッドシートにデータを追加しました' });
+  } catch (error) {
+    console.error('スプレッドシートへの追加エラー:', error);
+    res.status(500).send({ message: 'スプレッドシートへの追加に失敗しました' });
+  }
+});
