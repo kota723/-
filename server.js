@@ -233,7 +233,7 @@ app.use('/confirmation.html', express.static(path.join(__dirname, 'public', 'con
 
 // 教室予約のPOSTエンドポイント
 app.post('/reserve', async (req, res) => {
-  const { room, user, date, startTime, endTime, purpose } = req.body;
+  const { room, Name,user, date, startTime, endTime, purpose } = req.body;
 
   console.log('リクエストボディ:', req.body); // デバッグ用ログ
 
@@ -266,7 +266,7 @@ app.post('/reserve', async (req, res) => {
       return res.status(400).json({ message: '同じ時間帯に既に予約があります' });
   }
 
-  reservations.push({ room, user, date, startTime, endTime, purpose });
+  reservations.push({ room, Name,user, date, startTime, endTime, purpose });
   saveReservations(reservations);
 
   try {
@@ -338,8 +338,8 @@ const SPREADSHEET_ID = '1_MAdFa8aaQ5nHFg_6dkBVDHGqctu4flPDl-jfPRm6XY';
 // スプレッドシートにデータを追加するエンドポイント
 app.post('/add-to-sheet', async (req, res) => {
   try {
-    const { room, user, date, startTime, endTime, purpose } = req.body;
-    const values = [[room, user, date, startTime, endTime, purpose]];
+    const { room, Name, user, date, startTime, endTime, purpose } = req.body;
+    const values = [[room, Name, user, date, startTime, endTime, purpose]];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
