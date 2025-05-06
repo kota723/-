@@ -58,6 +58,7 @@
     // URLパラメータを取得して表示
     const params = new URLSearchParams(window.location.search);
     document.getElementById('room').textContent = params.get('room') || '不明';
+    document.getElementById('Name').textContent = params.get('Name') || '不明';
     document.getElementById('user').textContent = params.get('user') || '不明';
     document.getElementById('date').textContent = params.get('date') || '不明';
     document.getElementById('startTime').textContent = params.get('startTime') || '不明';
