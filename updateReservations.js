@@ -66,7 +66,7 @@ async function updateReservations() {
       valueInputOption: 'RAW',
       resource: {
         values: [
-          ['予約者', '日付', '開始時間', '終了時間', '用途'], // ヘッダー
+          ['団体名','予約者', '日付', '開始時間', '終了時間', '用途'], // ヘッダー
           ...rows
         ]
       }
