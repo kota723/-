@@ -194,7 +194,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ room, Name,user, date, startTime, endTime, purpose })
+        body: JSON.stringify({ room, Name, user, date, startTime, endTime, purpose })
       })
         .then(response => {
           if (response.redirected) {
