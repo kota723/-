@@ -286,8 +286,9 @@ app.post('/reserve', async (req, res) => {
 
     classrooms[room].available = false;
 
+    const redirectUrl = `/confirmation.html?room=${room}&Name=${encodeURIComponent(Name)}&user=${encodeURIComponent(user)}&date=${date}&startTime=${startTime}&endTime=${endTime}&purpose=${encodeURIComponent(purpose)}`;
     // 予約完了画面にリダイレクト
-    res.redirect(`/confirmation.html?room=${encodeURIComponent(room)}&user=${encodeURIComponent(user)}&date=${encodeURIComponent(date)}&startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}&purpose=${encodeURIComponent(purpose)}`);
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error('Slack通知エラー詳細:', error.data || error.message);
     res.status(500).json({ message: 'Slack通知に失敗しました' });

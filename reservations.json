@@ -150,5 +150,32 @@
     "startTime": "20:41",
     "endTime": "21:41",
     "purpose": "部活"
+  },
+  {
+    "room": "112",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-10",
+    "startTime": "10:27",
+    "endTime": "10:28",
+    "purpose": "撮影"
+  },
+  {
+    "room": "207",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-10",
+    "startTime": "10:30",
+    "endTime": "10:31",
+    "purpose": "撮影"
+  },
+  {
+    "room": "206",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-08",
+    "startTime": "16:09",
+    "endTime": "17:09",
+    "purpose": "mtg"
   }
 ]
