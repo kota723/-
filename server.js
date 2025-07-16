@@ -177,54 +177,21 @@ const auth = new google.auth.GoogleAuth({
 async function updateSpreadsheet(reservations) {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
-  const spreadsheetId = '1_MAdFa8aaQ5nHFg_6dkBVDHGqctu4flPDl-jfPRm6XY'; // 正しいスプレッドシートIDを設定
+  const spreadsheetId = SPREADSHEET_ID;
 
-  const sheetRequests = {};
+  const rows = reservations.map(({ room, Name, user, date, startTime, endTime, purpose }) => [
+    room, Name, user, date, startTime, endTime, purpose
+  ]);
 
-  reservations.forEach(reservation => {
-    const { room, Name,user, date, startTime, endTime, purpose} = reservation; // `Name`に変更
-
-    if (!sheetRequests[room]) {
-      sheetRequests[room] = [];
-    }
-
-    sheetRequests[room].push([Name ||  user ||  date, startTime, endTime, purpose]);
-  });
-
-  for (const [room, rows] of Object.entries(sheetRequests)) {
-    try {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        resource: {
-          requests: [
-            {
-              addSheet: {
-                properties: {
-                  title: room
-                }
-              }
-            }
-          ]
-        }
-      });
-    } catch (error) {
-      if (!error.message.includes('already exists')) {
-        console.error(`シート作成エラー: ${room}`, error);
-        continue;
-      }
-    }
-
+  try {
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${room}!A1`,
+      range: 'Sheet1!A2',
       valueInputOption: 'RAW',
-      resource: {
-        values: [
-          ['代表者名', '団体名', '日付', '開始時間', '終了時間', '用途'],
-          ...rows
-        ]
-      }
+      resource: { values: rows },
     });
+  } catch (error) {
+    console.error('スプレッドシート更新エラー:', error);
   }
 }
 
@@ -354,4 +321,19 @@ app.post('/add-to-sheet', async (req, res) => {
     console.error('スプレッドシートへの追加エラー:', error);
     res.status(500).send({ message: 'スプレッドシートへの追加に失敗しました' });
   }
+});
+
+// 新しいエンドポイント: 1週間分の予約状況を取得
+app.get('/weekly-reservations', (req, res) => {
+  const reservations = loadReservations();
+  const today = new Date();
+  const oneWeekLater = new Date();
+  oneWeekLater.setDate(today.getDate() + 7);
+
+  const weeklyReservations = reservations.filter(({ date }) => {
+    const reservationDate = new Date(date);
+    return reservationDate >= today && reservationDate <= oneWeekLater;
+  });
+
+  res.status(200).json(weeklyReservations);
 });

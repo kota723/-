@@ -231,5 +231,14 @@
     "startTime": "15:23",
     "endTime": "17:23",
     "purpose": "mtg"
+  },
+  {
+    "room": "102",
+    "Name": "鎌田滉大",
+    "user": "S2B",
+    "date": "2025-07-18",
+    "startTime": "08:42",
+    "endTime": "11:42",
+    "purpose": "mtg"
   }
 ]
