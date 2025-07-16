@@ -177,5 +177,59 @@
     "startTime": "16:09",
     "endTime": "17:09",
     "purpose": "mtg"
+  },
+  {
+    "room": "105",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-17",
+    "startTime": "12:26",
+    "endTime": "12:27",
+    "purpose": "mtg"
+  },
+  {
+    "room": "106",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-30",
+    "startTime": "20:12",
+    "endTime": "21:12",
+    "purpose": "mtg"
+  },
+  {
+    "room": "106",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-31",
+    "startTime": "13:54",
+    "endTime": "15:00",
+    "purpose": "mtg"
+  },
+  {
+    "room": "107",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-05-31",
+    "startTime": "13:55",
+    "endTime": "16:00",
+    "purpose": "mtg"
+  },
+  {
+    "room": "206",
+    "Name": "鎌田",
+    "user": "バドミントン部",
+    "date": "2025-06-06",
+    "startTime": "13:55",
+    "endTime": "18:55",
+    "purpose": "mtg"
+  },
+  {
+    "room": "202",
+    "Name": "鎌田",
+    "user": "MIF委員",
+    "date": "2025-06-16",
+    "startTime": "15:23",
+    "endTime": "17:23",
+    "purpose": "mtg"
   }
 ]

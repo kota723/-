@@ -28,6 +28,32 @@
     .room:hover {
       background-color: #218838; /* ホバー時の濃い緑色 */
     }
+
+    @media (max-width: 768px) {
+      .room {
+        width: 80px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+      }
+
+      body {
+        margin: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .room {
+        width: 60px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 12px;
+      }
+
+      body {
+        margin: 5px;
+      }
+    }
   </style>
 </head>
 <body>
